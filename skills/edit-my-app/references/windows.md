@@ -2,13 +2,27 @@
 
 ## Tools for this target
 
-Start with PowerShell metadata/hash/signature inspection. Add only needed
-[Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/)
-components such as SignTool or MakeAppx. Use
-[WinDbg](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/)
-for local debugging, [ILSpy](https://github.com/icsharpcode/ILSpy) for a .NET
-target, or a shared native analyzer for PE code when warranted. Native additions
-may need matching compiler build tools; resource inspection does not always do so.
+Start with PowerShell metadata, hashes, and signature inspection. Check the
+[shared inventory](tools.md) before choosing from this optional catalog. Native
+PE code, managed .NET code, and MSIX packaging need different tools.
+
+| Task | Tools and selection notes |
+| --- | --- |
+| PE headers, symbols, dependencies | [DUMPBIN](https://learn.microsoft.com/en-us/cpp/build/reference/dumpbin-reference) or [LLVM tools](https://llvm.org/docs/CommandGuide/) such as `llvm-readobj` and `llvm-objdump`. Prefer an existing toolchain. |
+| Native disassembly and decompilation | [Ghidra](https://github.com/NationalSecurityAgency/ghidra) for PE code. [Binary Ninja](https://binary.ninja/) or [IDA](https://hex-rays.com/ida-pro) are optional alternatives subject to edition/license and architecture support. |
+| Scripted native analysis | [PyGhidra](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/PyGhidra/README.md), [Capstone](https://www.capstone-engine.org/), and [LIEF](https://lief.re/) for their respective analysis/format roles. |
+| Python PE and .NET inspection | [pefile](https://github.com/erocarrera/pefile) for PE structures, [dnfile](https://github.com/malwarefrank/dnfile) for CLR metadata, [dncil](https://github.com/mandiant/dncil) for CIL decoding. |
+| Managed-code analysis and editing | [ILSpy](https://github.com/icsharpcode/ILSpy) for .NET decompilation, [dnSpyEx](https://github.com/dnSpyEx/dnSpy) for supported .NET debugging/assembly editing. Confirm runtime support and preserve assembly identity constraints. |
+| Native debugging and crash inspection | [WinDbg](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/). [x64dbg](https://x64dbg.com/) is another choice for x86/x64 user applications, not an ARM64 debugger. |
+| File and registry observations | [Process Monitor](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon) with filters for the clone's test process. Ask before any elevation it requires and avoid collecting unrelated user activity. |
+| Icons, dialogs, and structured bytes | [Resource Hacker](https://www.angusj.com/resourcehacker/) for supported Win32 resources, [ImHex](https://github.com/WerWolv/ImHex) for inspection. Byte edits invalidate existing signatures. |
+| Instruction assembly and isolated tests | [LLVM tools](https://llvm.org/docs/CommandGuide/) or [Keystone](https://www.keystone-engine.org/), plus [Unicorn](https://www.unicorn-engine.org/). Check CPU support and model only the required test context. |
+| Small native additions | [MSVC Build Tools](https://learn.microsoft.com/en-us/cpp/overview/acquire-msvc) or an appropriate [LLVM toolchain](https://llvm.org/). Match the target ABI, runtime, and architecture. |
+| Signing and packaging | [SignTool](https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool) and [MakeAppx](https://learn.microsoft.com/en-us/windows/msix/package/create-app-package-with-makeappx-tool) from needed Windows SDK components. Packaging does not grant trust. |
+
+Use [isolated Python environments](tools.md#python-packages). Do not request the
+entire Visual Studio or Windows SDK installation for a metadata-only change.
+Portable tools and vendor SDKs follow their respective storage/inventory rules.
 
 ## Locate and classify
 

@@ -30,7 +30,8 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(plugin['license'], 'MIT')
         self.assertNotIn('hooks', plugin)
         self.assertNotIn('mcpServers', plugin)
-        self.assertLess(sum(p.stat().st_size for p in SKILL.rglob('*') if p.is_file()), 50000)
+        # Five platform catalogs and shared references still fit in 64 KiB of text.
+        self.assertLess(sum(p.stat().st_size for p in SKILL.rglob('*') if p.is_file()), 64 * 1024)
 
     def test_local_markdown_links(self):
         for document in ROOT.rglob('*.md'):
@@ -58,6 +59,40 @@ class PackageTests(unittest.TestCase):
             for name in FILES:
                 self.assertIn(name, text, f'{installer} omits {name}')
         subprocess.run(['bash', '-n', str(ROOT / 'install.sh')], check=True)
+
+    def test_platform_tool_catalogs(self):
+        format_tools = {'macos': 'macholib', 'ios': 'macholib', 'windows': 'pefile',
+                        'linux': 'pyelftools', 'android': 'Androguard'}
+        for target, format_tool in format_tools.items():
+            text = (SKILL / f'references/{target}.md').read_text()
+            catalog = text.split('## Tools for this target', 1)[1].split('\n## ', 1)[0]
+            self.assertIn('[Ghidra](https://github.com/NationalSecurityAgency/ghidra)', catalog)
+            self.assertIn('[Capstone](https://www.capstone-engine.org/)', catalog)
+            self.assertIn(format_tool, catalog)
+            self.assertIn('tools.md#python-packages', catalog)
+
+    def test_python_package_catalog(self):
+        text = (SKILL / 'references/tools.md').read_text()
+        for package in ('capstone', 'keystone-engine', 'unicorn', 'lief', 'pyghidra',
+                        'macholib', 'pyelftools', 'pefile', 'dnfile', 'dncil',
+                        'androguard', 'angr', 'construct', 'yara-python'):
+            self.assertIn(f'`{package}`', text)
+        self.assertIn('<tools-dir>/python/<environment-name>/', text)
+        self.assertIn('not a bulk `pip install` command', text)
+
+    def test_readme_status_permissions_and_style(self):
+        text = (ROOT / 'README.md').read_text()
+        self.assertIn('| [macOS](skills/edit-my-app/references/macos.md) | Verified |', text)
+        self.assertIn('Only macOS has been verified so far.', text)
+        self.assertIn('## Permissions', text)
+        self.assertIn('administrator approval', text)
+        self.assertLessEqual(len(text.split()), 400)
+        # Keep required syntax in commands, URLs, the skill name, and table rules.
+        prose = re.sub(r'```[\s\S]*?```', '', text)
+        prose = re.sub(r'\]\([^)]+\)', ']', prose)
+        prose = re.sub(r'^\|[ |:-]+\|$', '', prose, flags=re.MULTILINE)
+        prose = prose.replace('edit-my-app', '')
+        self.assertNotRegex(prose, r'[;\u2013\u2014-]')
 
 
 class InstallerTests(unittest.TestCase):

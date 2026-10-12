@@ -2,11 +2,27 @@
 
 ## Tools for this target
 
-Prefer installed `file` and [GNU Binutils](https://www.gnu.org/software/binutils/)
-(`readelf`, `objdump`, `strings`). Use the existing compiler, GDB/LLDB, and
-format-specific packaging utilities only when needed. Ghidra is an optional
-decompiler, not a prerequisite; do not download Android or Apple SDKs for a
-Linux desktop target.
+Prefer installed `file`, `readelf`, `objdump`, and `strings`. Check the
+[shared inventory](tools.md) before adding a tool. Match both distribution/host
+support and the target's ABI. Do not install mobile or Apple SDKs for this target.
+
+| Task | Tools and selection notes |
+| --- | --- |
+| ELF metadata, symbols, debug information | [GNU Binutils](https://sourceware.org/binutils/), [elfutils](https://sourceware.org/elfutils/), or [LLVM tools](https://llvm.org/docs/CommandGuide/). Static inspection avoids executing an unfamiliar binary just to list dependencies. |
+| Native disassembly and decompilation | [Ghidra](https://github.com/NationalSecurityAgency/ghidra) for ELF code. [Rizin](https://github.com/rizinorg/rizin), [Cutter](https://cutter.re/), or [radare2](https://github.com/radareorg/radare2) are alternative analysis interfaces. |
+| Python ELF and instruction inspection | [pyelftools](https://github.com/eliben/pyelftools) for ELF/DWARF, [LIEF](https://lief.re/) for structured ELF work, [Capstone](https://www.capstone-engine.org/) for instructions. |
+| Scripted decompilation and deeper analysis | [PyGhidra](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/PyGhidra/README.md). [angr](https://github.com/angr/angr) is an optional heavier choice for bounded local control-flow/symbolic tests. |
+| Debugging and runtime diagnosis | [GDB](https://sourceware.org/gdb/) or [LLDB](https://lldb.llvm.org/). [strace](https://strace.io/) for the clone's system calls, [Valgrind](https://valgrind.org/) for supported memory/runtime checks. Respect process-access policy. |
+| Local dependency/layout adjustments | [patchelf](https://github.com/NixOS/patchelf) for supported ELF metadata changes. Never use it to redirect system-wide loading or modify the original app. |
+| Instruction assembly and isolated tests | [LLVM tools](https://llvm.org/docs/CommandGuide/) or [Keystone](https://www.keystone-engine.org/), plus [Unicorn](https://www.unicorn-engine.org/). CPU emulation does not reproduce a full Linux process environment. |
+| Resources and binary comparison | [ImHex](https://github.com/WerWolv/ImHex) or existing byte-comparison utilities. Use [Construct](https://github.com/construct/construct) only if a custom binary resource needs a parser. |
+| Small native additions | Existing [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) with matching development headers. Do not replace the distribution's toolchain or shared runtime. |
+| Packaging when applicable | [appimagetool](https://github.com/AppImage/appimagetool), [Flatpak Builder](https://docs.flatpak.org/en/latest/flatpak-builder.html), or [Snapcraft](https://documentation.ubuntu.com/snapcraft/stable/). Select only the input's supported packaging route. |
+| Visible desktop launcher | Follow the [Desktop Entry specification](https://specifications.freedesktop.org/desktop-entry/latest-single/) and [desktop-file-utils](https://wiki.freedesktop.org/www/Software/desktop-file-utils/) validation where available. |
+
+Use [isolated Python environments](tools.md#python-packages). Tools requiring a
+new system package, a container service, or elevated process access need a
+separate permission decision. Ghidra is optional, not a launch prerequisite.
 
 ## Find the artifact and packaging boundary
 

@@ -6,11 +6,26 @@ or processor architecture. Recheck the actual target before promising a result.
 
 ## Tools for this target
 
-Start with installed `plutil`, `file`, `ditto`, `codesign`, and the selected
-[Apple developer tools](https://developer.apple.com/xcode/resources/): `otool`,
-`lipo`, `clang`, and LLDB as needed. Resource-only work may need no compiler;
-full Xcode and Ghidra are not automatic prerequisites. Check the shared tool
-inventory and host-specific storage contract before downloading anything.
+Start with installed `plutil`, `file`, `ditto`, and `codesign`. Check the
+[tool inventory and storage rules](tools.md) before adding anything. The catalog
+is optional and applies to the working copy, not the system app.
+
+| Task | Tools and selection notes |
+| --- | --- |
+| Architectures, dependencies, symbols | [Apple developer tools](https://developer.apple.com/xcode/resources/) provide `otool`, `lipo`, `nm`, and related utilities. [LLVM tools](https://llvm.org/docs/CommandGuide/) are alternatives for supported object formats. |
+| Native disassembly and decompilation | [Ghidra](https://github.com/NationalSecurityAgency/ghidra) for Mach-O analysis. [Hopper](https://www.hopperapp.com/) is an optional commercial alternative. Confirm architecture coverage. |
+| Scripted native analysis | [PyGhidra](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/PyGhidra/README.md) for Ghidra automation, [Capstone](https://www.capstone-engine.org/) for instruction decoding. |
+| Python executable inspection | [LIEF](https://lief.re/) for structured Mach-O work, [macholib](https://macholib.readthedocs.io/) for headers and dependencies. Use `plistlib` for simple property lists. |
+| Objective-C metadata | [class-dump](https://github.com/nygard/class-dump) when compatible with the artifact. Its metadata output is not recovered source or a general Swift decompiler. |
+| Instruction assembly and isolated tests | [LLVM tools](https://llvm.org/docs/CommandGuide/) or [Keystone](https://www.keystone-engine.org/) for supported instructions, [Unicorn](https://www.unicorn-engine.org/) for small CPU test cases. Neither recreates AppKit or macOS. |
+| Debugging and profiling | [LLDB](https://lldb.llvm.org/) for the clone's process and crashes. [Xcode Instruments](https://developer.apple.com/xcode/) when profiling is needed. Normal debugging permissions still apply. |
+| Resources and byte comparison | Installed `plutil`, `sips`, and `iconutil` for relevant metadata/images/icons. [ImHex](https://github.com/WerWolv/ImHex) for structured byte inspection. Do not assume arbitrary asset catalogs can be rebuilt. |
+| Small native additions | [Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools/) for Clang and available SDKs. Use [Xcode](https://developer.apple.com/xcode/) only when the required SDK or asset tooling needs it. |
+| Signing and delivery | Installed `codesign` and Keychain tools using [Apple's signing guide](https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html). Copy with `ditto`, then test the separately named app in Applications. |
+
+Use local manual pages for installed Apple utilities. Check Python package names
+and environment rules in [the shared catalog](tools.md#python-packages). Full
+Xcode, a Java runtime, and Ghidra are separate decisions, not startup requirements.
 
 ## Find the app and check prerequisites
 

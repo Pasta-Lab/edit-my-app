@@ -2,13 +2,28 @@
 
 ## Tools for this target
 
-Check [Android SDK tools](https://developer.android.com/tools), including ADB,
-apksigner, and [zipalign](https://developer.android.com/tools/zipalign), before
-downloading them. [JADX](https://github.com/skylot/jadx) can inspect DEX bytecode;
-[Apktool](https://apktool.org/) handles package resources/bytecode workflows.
-Choose compatible releases and their documented Java runtimes only as needed.
-Android Studio, an emulator image, and the NDK are separate optional downloads,
-not prerequisites for every change. Downloads must match the desktop host OS/CPU.
+Run tools on the desktop host and check the [shared inventory](tools.md) first.
+Distinguish APK resources, DEX bytecode, and native ELF libraries. They do not
+share a single decompiler or rebuild path.
+
+| Task | Tools and selection notes |
+| --- | --- |
+| SDK component discovery | [sdkmanager](https://developer.android.com/tools/sdkmanager) and [Android SDK tools](https://developer.android.com/tools). Select only needed host-compatible components, not all of Android Studio. |
+| Package, manifest, and resource inspection | [apkanalyzer](https://developer.android.com/tools/apkanalyzer) and [AAPT2](https://developer.android.com/tools/aapt2) for APK contents/resources. |
+| DEX decompilation | [JADX](https://github.com/skylot/jadx) for Java-like views of DEX. Decompiled output is for understanding, not a guarantee of recompilable original source. |
+| Resources and bytecode changes | [Apktool](https://apktool.org/) for supported decode/rebuild workflows, [smali/baksmali](https://github.com/google/smali) for DEX assembly/disassembly. Work only on the copied authorized package. |
+| Native disassembly and decompilation | [Ghidra](https://github.com/NationalSecurityAgency/ghidra) on the desktop host for native `.so` libraries. Use [PyGhidra](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/PyGhidra/README.md) if scripted Ghidra analysis is needed. |
+| Python APK and native inspection | [Androguard](https://github.com/androguard/androguard) for APK/DEX structures. [LIEF](https://lief.re/), [pyelftools](https://github.com/eliben/pyelftools), and [Capstone](https://www.capstone-engine.org/) for native libraries and instructions. |
+| Instruction assembly and bounded tests | [Keystone](https://www.keystone-engine.org/) or [LLVM tools](https://llvm.org/docs/CommandGuide/), plus [Unicorn](https://www.unicorn-engine.org/). CPU emulation does not supply Android framework APIs. |
+| Small native additions and debugging | [Android NDK](https://developer.android.com/ndk) for matching native toolchains, [LLDB](https://lldb.llvm.org/) for permitted developer-build debugging. Match each required ABI and supported API level. |
+| Alignment, signing, and verification | [zipalign](https://developer.android.com/tools/zipalign) and [apksigner](https://developer.android.com/tools/apksigner). Use the new app's own key and validate every APK in a split set. |
+| App Bundle inputs | [bundletool](https://github.com/google/bundletool) for supported `.aab`/APK-set workflows. Do not treat an AAB as an installable APK or omit required splits. |
+| Deployment and test environment | [ADB](https://developer.android.com/tools/adb) for user-approved device communication and logs. [Android Emulator](https://developer.android.com/studio/run/emulator) is an optional disposable test environment. |
+
+Choose the selected tool's documented Java runtime only when needed. Android
+Studio, an emulator image, and the NDK are separate optional downloads. Check
+host OS/CPU compatibility and follow [Python environment rules](tools.md#python-packages).
+None of these tools grants access to protected app data or bypasses device policy.
 
 ## Confirm a supported input
 

@@ -2,11 +2,27 @@
 
 ## Tools for this target
 
-Use an existing compatible [Xcode installation](https://developer.apple.com/xcode/)
-on the Mac host for its device/simulator SDKs, signing, and deployment tools.
-Mac command-line tools alone are not an iOS SDK. Static inspection may use
-`otool` or the shared optional analyzers; do not download a mobile exploitation
-toolkit. Store/index tools by the host OS, not under an invented iOS tools path.
+Run analysis tools on the desktop host. For the supported development route,
+use a compatible Mac/Xcode setup. Mac command-line tools alone are not an iOS
+SDK. Check [the inventory](tools.md) before downloads. This catalog does not
+make an encrypted or unprovisioned app a usable input.
+
+| Task | Tools and selection notes |
+| --- | --- |
+| Bundle and architecture inspection | [Apple developer tools](https://developer.apple.com/xcode/resources/) including `otool`, `lipo`, `nm`, and installed `plutil`. Inspect the supplied developer or simulator artifact. |
+| Native disassembly and decompilation | [Ghidra](https://github.com/NationalSecurityAgency/ghidra) on the desktop host for authorized, unencrypted Mach-O code. [Hopper](https://www.hopperapp.com/) is an optional commercial alternative. |
+| Scripted native analysis | [PyGhidra](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Features/PyGhidra/README.md) for Ghidra automation and [Capstone](https://www.capstone-engine.org/) for supported CPU instructions. |
+| Python package inspection | [LIEF](https://lief.re/) and [macholib](https://macholib.readthedocs.io/) for Mach-O structures. Standard `plistlib` can read property lists. None decrypts protected apps or supplies provisioning. |
+| Language metadata | [class-dump](https://github.com/nygard/class-dump) for compatible Objective-C metadata. Use the matching [Swift toolchain](https://www.swift.org/tools/) for Swift symbol demangling, not source reconstruction. |
+| Instruction assembly and unit tests | [LLVM tools](https://llvm.org/docs/CommandGuide/) or [Keystone](https://www.keystone-engine.org/), plus [Unicorn](https://www.unicorn-engine.org/) for bounded CPU tests. A CPU emulator is not an iOS runtime. |
+| Debugging and profiling | [LLDB](https://lldb.llvm.org/) and [Xcode Instruments](https://developer.apple.com/xcode/) for permitted developer builds. Device pairing and debugging entitlements still apply. |
+| Resources and native additions | [Xcode](https://developer.apple.com/xcode/) for iOS SDKs, asset tools, Clang/Swift, and Interface Builder where usable resources exist. [ImHex](https://github.com/WerWolv/ImHex) for byte inspection. |
+| Signing, simulator, and device delivery | [Xcode developer tools](https://developer.apple.com/documentation/xcode) including the available `simctl` and `devicectl`. Follow valid Apple development provisioning, not desktop self-signing. |
+| Optional paired-device information | [libimobiledevice](https://libimobiledevice.org/) for supported device communication when needed. Pairing requires user consent. It is not a replacement for Apple signing or a route to private app data. |
+
+Keep tools in the desktop host's managed directory or index their existing SDK
+paths. Follow [Python environment rules](tools.md#python-packages). Do not
+install a phone-side analysis service or exploitation toolkit as a prerequisite.
 
 ## Feasibility comes first
 
