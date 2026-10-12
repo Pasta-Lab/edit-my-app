@@ -1,0 +1,8 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "edit-my-app",
+  "version": "0.1.0",
+  "description": "Omniform Software Engineering: customize a local copy of an existing compiled app with an AI coding agent. Only the macOS prototype workflow is verified.",
+  "license": "MIT",
+  "repository": "https://github.com/Pasta-Lab/edit-my-app"
+}
