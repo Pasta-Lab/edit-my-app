@@ -1,4 +1,4 @@
-# Local-checkout installer. Windows/PowerShell runtime behavior is unverified.
+# Windows/PowerShell runtime behavior is unverified.
 [CmdletBinding()]
 param(
     [ValidateSet('codex', 'claude')][string]$Agent = 'codex',
@@ -32,12 +32,13 @@ $targetPath = Join-Path $parentPath 'edit-my-app'
 Assert-PlainPath $targetPath
 if (Test-Path -LiteralPath $targetPath) {
     Write-Output "Already exists; left untouched: $targetPath. Move this skill aside before updating it."
-    exit 0
+    return
 }
-$sourcePath = Join-Path $PSScriptRoot 'skills/edit-my-app'
-if (-not (Test-Path -LiteralPath $sourcePath -PathType Container)) { throw 'Run this script from a complete checkout.' }
 $files = @('SKILL.md', 'references/workflow.md', 'references/tools.md', 'references/macos.md',
     'references/ios.md', 'references/windows.md', 'references/linux.md', 'references/android.md', 'LICENSE')
+$sourcePath = if ($PSScriptRoot) { Join-Path $PSScriptRoot 'skills/edit-my-app' } else { $null }
+$localSource = $sourcePath -and (Test-Path -LiteralPath $sourcePath -PathType Container)
+if ($sourcePath -and -not $localSource) { throw 'The local checkout is incomplete. Use the remote install command or a complete checkout.' }
 [IO.Directory]::CreateDirectory($parentPath) | Out-Null
 $stagePath = Join-Path $parentPath ('.edit-my-app-stage.' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $stagePath | Out-Null
@@ -45,11 +46,21 @@ try {
     $payloadPath = Join-Path $stagePath 'edit-my-app'
     [IO.Directory]::CreateDirectory((Join-Path $payloadPath 'references')) | Out-Null
     foreach ($file in $files) {
-        $fromPath = Join-Path $sourcePath $file
-        Assert-PlainPath $fromPath
-        $fromItem = Get-Item -LiteralPath $fromPath
-        if ($fromItem.PSIsContainer -or $fromItem.Length -eq 0) { throw "Invalid skill file: $file" }
-        Copy-Item -LiteralPath $fromPath -Destination (Join-Path $payloadPath $file)
+        $toPath = Join-Path $payloadPath $file
+        if ($localSource) {
+            $fromPath = Join-Path $sourcePath $file
+            Assert-PlainPath $fromPath
+            $fromItem = Get-Item -LiteralPath $fromPath
+            if ($fromItem.PSIsContainer -or $fromItem.Length -eq 0) { throw "Invalid skill file: $file" }
+            Copy-Item -LiteralPath $fromPath -Destination $toPath
+        }
+        else {
+            $uri = "https://raw.githubusercontent.com/Pasta-Lab/edit-my-app/main/skills/edit-my-app/$file"
+            Invoke-WebRequest -UseBasicParsing -Uri $uri -OutFile $toPath
+            if (-not (Test-Path -LiteralPath $toPath -PathType Leaf) -or (Get-Item -LiteralPath $toPath).Length -eq 0) {
+                throw "Download was empty or invalid: $file"
+            }
+        }
     }
     $header = Get-Content -LiteralPath (Join-Path $payloadPath 'SKILL.md') -Raw
     if ($header -notmatch '(?m)^name: edit-my-app\r?$' -or -not $header.StartsWith('---')) {

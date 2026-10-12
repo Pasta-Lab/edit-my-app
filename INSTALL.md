@@ -47,18 +47,18 @@ existing project guide. Do not replace unrelated project or global instructions.
 
 ## Windows — unverified
 
-[Download the ZIP](https://github.com/Pasta-Lab/edit-my-app/archive/refs/heads/main.zip)
-and extract it, or clone the repository. Open PowerShell in that repository
-folder and run:
+Run in PowerShell:
 
 ```powershell
-.\install.ps1
+irm https://raw.githubusercontent.com/Pasta-Lab/edit-my-app/main/install.ps1 | iex
 ```
+
+Alternatively, [download the ZIP](https://github.com/Pasta-Lab/edit-my-app/archive/refs/heads/main.zip)
+and extract it, or clone the repository. Then, run `./install.ps1`
 
 `-Agent claude` and `-Destination 'C:\absolute\skills'` select other hosts. If
 organizational policy blocks scripts, ask your agent to copy the skill directory
-instead; do not weaken execution policy. This PowerShell installer needs the
-complete downloaded repository; it does not support piping a remote script.
+instead; do not weaken execution policy.
 
 ## iOS / Android targets
 

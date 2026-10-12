@@ -61,6 +61,17 @@ class PackageTests(unittest.TestCase):
                 self.assertIn(name, text, f'{installer} omits {name}')
         subprocess.run(['bash', '-n', str(ROOT / 'install.sh')], check=True)
 
+    def test_powershell_remote_install_route_is_documented(self):
+        installer = (ROOT / 'install.ps1').read_text()
+        self.assertIn('https://raw.githubusercontent.com/Pasta-Lab/edit-my-app/main/skills/edit-my-app/$file', installer)
+        self.assertIn('Invoke-WebRequest -UseBasicParsing -Uri $uri -OutFile $toPath', installer)
+        self.assertIn("$PSScriptRoot", installer)
+        self.assertIn('    return\n}', installer)
+        self.assertNotIn('exit 0', installer)
+        for document in ('README.md', 'INSTALL.md'):
+            text = (ROOT / document).read_text()
+            self.assertIn('install.ps1 | iex', text, f'{document} omits the remote PowerShell install command')
+
     def test_platform_tool_catalogs(self):
         format_tools = {'macos': 'macholib', 'ios': 'macholib', 'windows': 'pefile',
                         'linux': 'pyelftools', 'android': 'Androguard'}

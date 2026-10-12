@@ -25,11 +25,10 @@ download or clone and follow [local installation](INSTALL.md#macos--linux-local-
 
 ### Windows (unverified)
 
-[Download the ZIP](https://github.com/Pasta-Lab/edit-my-app/archive/refs/heads/main.zip),
-extract it, open PowerShell in the extracted repository folder, and run:
+In PowerShell, run:
 
 ```powershell
-.\install.ps1
+irm https://raw.githubusercontent.com/Pasta-Lab/edit-my-app/main/install.ps1 | iex
 ```
 
 iOS and Android use a desktop agent, not an installer running on the phone.
