@@ -9,6 +9,10 @@ downloaded or cloned repository, open Terminal in its folder and run:
 bash ./install.sh
 ```
 
+If the repository is private, sign in to GitHub to download it or use an
+authenticated clone. The README's public `curl` command will not work until
+the repository is publicly readable; no visibility changes are made by installers.
+
 The Bash installer has been tested on macOS; Linux installation is unverified.
 
 The default destination is `~/.agents/skills/edit-my-app`, a

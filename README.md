@@ -21,6 +21,9 @@ Paste into Terminal (Linux installation is unverified):
 curl -fsSL https://raw.githubusercontent.com/Pasta-Lab/edit-my-app/main/install.sh | bash
 ```
 
+This link requires a public repository. While private, use an authenticated
+download or clone and follow [local installation](INSTALL.md#macos--linux-local-checkout).
+
 ### Windows — unverified
 
 [Download the ZIP](https://github.com/Pasta-Lab/edit-my-app/archive/refs/heads/main.zip),
