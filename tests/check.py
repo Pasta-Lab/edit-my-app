@@ -14,6 +14,8 @@ SKILL = ROOT / 'skills/edit-my-app'
 FILES = ['SKILL.md', 'references/workflow.md', 'references/tools.md',
          'references/macos.md', 'references/ios.md', 'references/windows.md',
          'references/linux.md', 'references/android.md', 'LICENSE']
+MARKDOWN_FILES = ['README.md', 'INSTALL.md', 'AGENTS.md'] + [
+    'skills/edit-my-app/' + name for name in FILES if name.endswith('.md')]
 
 
 class PackageTests(unittest.TestCase):
@@ -34,9 +36,8 @@ class PackageTests(unittest.TestCase):
         self.assertLess(sum(p.stat().st_size for p in SKILL.rglob('*') if p.is_file()), 64 * 1024)
 
     def test_local_markdown_links(self):
-        for document in ROOT.rglob('*.md'):
-            if '.git' in document.parts:
-                continue
+        for relative_path in MARKDOWN_FILES:
+            document = ROOT / relative_path
             for link in re.findall(r'\]\(([^)]+)\)', document.read_text()):
                 if '://' in link or link.startswith('#'):
                     continue

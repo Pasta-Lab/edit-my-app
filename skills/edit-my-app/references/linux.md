@@ -26,10 +26,12 @@ separate permission decision. Ghidra is optional, not a launch prerequisite.
 
 ## Find the artifact and packaging boundary
 
-Accept an app-menu name. Inspect its desktop entry, executable location, package
-metadata, architecture, and dependencies read-only. Distinguish a portable ELF
-application, AppImage, unpacked app bundle, distro package, Flatpak, and Snap.
-Never patch a package manager's installed `/usr` files or protected runtimes.
+Accept an app-menu name or CLI command. Inspect its desktop entry when present,
+executable location, package metadata, architecture, and dependencies read-only.
+For a CLI app, record the resolved command and executable path. Distinguish a
+portable ELF application, AppImage, unpacked app bundle, distro package, Flatpak,
+and Snap. Never patch a package manager's installed `/usr` files or protected
+runtimes.
 
 Work on a full, authorized copy in the user's project. Package-managed apps may
 need a supported export or separately staged package; copying an ELF executable
@@ -56,7 +58,7 @@ clone configuration through supported mechanisms; do not redirect system-wide
 library searches or disable SELinux/AppArmor. Never change global loader settings
 to make a local patch work.
 
-## Integrity and a visible launcher
+## Integrity and launch route
 
 There is no universal Linux app code-signing equivalent to macOS. Respect the
 chosen package/container format's integrity and signing requirements; use the
@@ -65,16 +67,20 @@ created signature does not make a modified package trusted by its distributor.
 Do not forge vendor signatures or weaken package verification.
 
 For an independent user app, stage the clone under
-`${XDG_DATA_HOME:-$HOME/.local/share}/omniform/apps/<new-name>/`. Provide a unique
-`.desktop` launcher under `${XDG_DATA_HOME:-$HOME/.local/share}/applications/`,
-with the actual executable and icon paths, correct escaping, and a distinct ID.
-The `Exec` value is not arbitrary shell syntax; follow the
+`${XDG_DATA_HOME:-$HOME/.local/share}/omniform/apps/<new-name>/`. For a desktop
+app, provide a unique `.desktop` launcher under
+`${XDG_DATA_HOME:-$HOME/.local/share}/applications/`, with the actual executable
+and icon paths, correct escaping, and a distinct ID. The `Exec` value is not
+arbitrary shell syntax; follow the
 [Desktop Entry specification](https://specifications.freedesktop.org/desktop-entry/latest-single/)
 and [XDG directory rules](https://specifications.freedesktop.org/basedir-spec/latest/).
 Use supported per-user package registration instead when the chosen format needs it.
 
-Test from the desktop menu, not just an interactive shell with extra environment
-variables. Check the new feature, normal behavior, and unchanged original. Explain
-how to remove this clone and its launcher without removing shared runtimes or
-the original app. Keep a rollback archive and report the tested distribution,
-desktop, and architecture. Local functionality does not grant redistribution rights.
+For a CLI app, use a terminal command as the launch route. A desktop launcher is optional. In WSL or other headless environments, test from a terminal and report that desktop menu launch is not applicable. Use an app supported profile override or isolated XDG directories for test data. For a protocol change, use a disposable local fixture bound to loopback and capture the exchanged commands. Do not validate behavior changing patches on public services.
+
+For desktop apps, test from the desktop menu, not just an interactive shell with
+extra environment variables. Check the new feature, normal behavior, and unchanged
+original. Explain how to remove this clone and its launcher without removing
+shared runtimes or the original app. Keep a rollback archive and report the tested
+distribution, desktop or terminal route, and architecture. Local functionality
+does not grant redistribution rights.
